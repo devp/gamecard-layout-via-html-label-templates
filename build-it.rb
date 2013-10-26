@@ -1,11 +1,17 @@
 require 'enumerator'
 
+csv_input = ARGV[0]
+output_codename = ARGV[1]
+
+raise "need csv_input" unless csv_input
+raise "need output_codename" unless output_codename
+
+#TODO: read real content
 sample_content = {
 	title: "Card Title", 
 	subtitle: "Card Subtitle", 
 	description: "description..."
 }
-
 content = Array.new(17, sample_content)
 
 PAGE_SIZE = 10
@@ -44,4 +50,5 @@ end
 
 tmpl = open("template-base.html").read
 
-puts tmpl.sub("$CONTENT", card_content)
+File.open("#{output_codename}.html", "w"){|f| f << tmpl.sub("$CONTENT", card_content)}
+puts `prince #{output_codename}.html`
