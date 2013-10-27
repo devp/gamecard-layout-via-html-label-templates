@@ -72,11 +72,9 @@ def content_strategy_addresses(content)
 			card_content += "<tr>\n"
 			col_count = 0
 			row_of_content.each do |card|
-				card_content += "<td>\n"
-				card_content += "<h1>" + card[:title] + "</h1>"
-				card_content += "<h2>" + card[:subtitle] + "</h2>"
+				card_content += "<td>\n"				
 				card_html = card_html_modifier(card[:description])
-				card_content += "<p>" + card_html + "</p>"
+				card_content += "<p>" + "<b>" + card[:title] + "</b> " + card_html + "</p>"
 				card_content += "</td>\n"
 				if col_count < row_size
 					card_content += "<td class='separator' />\n"
