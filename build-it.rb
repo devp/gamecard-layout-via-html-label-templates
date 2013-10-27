@@ -1,30 +1,39 @@
 require 'enumerator'
 require 'csv'
 
-csv_input = ARGV[0]
-output_codename = ARGV[1]
+template_input = ARGV[0]
+csv_input = ARGV[1]
+output_codename = ARGV[2]
 
+raise "need template_input" unless template_input
 raise "need csv_input" unless csv_input
 raise "need output_codename" unless output_codename
 
+tmpl = open(template_input).read
+
 content = CSV.read(csv_input, :headers => true).map do |c|
-	{title: c['Title'],
-	 subtitle: c['Subtitle'],
-	 description: c['Description']
+	card = {
+		title: c['Title'] || "",
+		subtitle: c['Subtitle'] || "",
+		description: c['Description'] || ""
 	}
+	n = (c['Quantity'] || 1).to_i
+	Array.new(n, card)
+end.flatten
+
+def card_html_modifier(txt)
+	# TODO: tie these to feature flags of a sort
+	# and make them less context dependent
+	html = txt.strip
+	html.gsub!(/([+-][0-9]+)/, "<span class='bonus-modifier'>\\1</span>")
+	html.gsub!(/\n([2-9]+\. )/, " <br/> \\1")
+	html.gsub!(/^(.*: )/, "<b>\\1</b>")
+	html.gsub!("\n", "<br/><br/>")
+	html
 end
 
 PAGE_SIZE = 10
 ROW_SIZE = 5
-
-output = []
-content.each_slice(PAGE_SIZE) do |page_of_content|
-	this_page = []
-	page_of_content.each_slice(ROW_SIZE) do |row_of_content|
-		this_page << row_of_content.map{"1"}
-	end
-	output << this_page
-end
 
 card_content = ""
 row_count = 0
@@ -36,7 +45,8 @@ content.each_slice(PAGE_SIZE) do |page_of_content|
 			card_content += "<td>\n"
 			card_content += "<h1>" + card[:title] + "</h1>"
 			card_content += "<h2>" + card[:subtitle] + "</h2>"
-			card_content += "<p>" + card[:description] + "</p>"
+			card_html = card_html_modifier(card[:description])
+			card_content += "<p>" + card_html + "</p>"
 			card_content += "</td>\n"
 		end
 		card_content += "</tr>\n"
@@ -47,8 +57,6 @@ content.each_slice(PAGE_SIZE) do |page_of_content|
 	end
 	card_content += "<table>\n"
 end
-
-tmpl = open("template-base.html").read
 
 File.open("#{output_codename}.html", "w"){|f| f << tmpl.sub("$CONTENT", card_content)}
 puts `prince #{output_codename}.html`

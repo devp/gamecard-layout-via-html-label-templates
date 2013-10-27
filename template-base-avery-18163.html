@@ -2,7 +2,7 @@
 <head>
 <style>
 @media print {
-	@page{
+	@page {
 		size: landscape;
 		margin: 0.22in 0.42in 0.22in 0.42in;
 	}
@@ -23,10 +23,20 @@ td {
 	vertical-align: top;
 	-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 	padding: 0.05in;
+	/*border: 0.1px solid black;*/
 }
 
-td p {
-	font-size: 10px;
+* { font-family: sans-serif; }
+
+td h1 { font-size: 16px; }
+td h2 { font-size: 10px; font-style: italic; font-weight: normal; font-family: serif; } 
+td p { font-size: 12px; }
+
+/* feature specific */
+
+.bonus-modifier {
+	font-family: monospace;
+	font-weight: bold;
 }
 
 </style>
