@@ -1,4 +1,5 @@
 require 'enumerator'
+require 'csv'
 
 csv_input = ARGV[0]
 output_codename = ARGV[1]
@@ -6,13 +7,12 @@ output_codename = ARGV[1]
 raise "need csv_input" unless csv_input
 raise "need output_codename" unless output_codename
 
-#TODO: read real content
-sample_content = {
-	title: "Card Title", 
-	subtitle: "Card Subtitle", 
-	description: "description..."
-}
-content = Array.new(17, sample_content)
+content = CSV.read(csv_input, :headers => true).map do |c|
+	{title: c['Title'],
+	 subtitle: c['Subtitle'],
+	 description: c['Description']
+	}
+end
 
 PAGE_SIZE = 10
 ROW_SIZE = 5
