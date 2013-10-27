@@ -32,30 +32,68 @@ def card_html_modifier(txt)
 	html
 end
 
-PAGE_SIZE = 10
-ROW_SIZE = 5
+def content_strategy_wide(content)
+	page_size = 10
+	row_size = 5
 
-card_content = ""
-row_count = 0
-content.each_slice(PAGE_SIZE) do |page_of_content|
-	card_content += "<table>\n"
-	page_of_content.each_slice(ROW_SIZE) do |row_of_content|
-		card_content += "<tr>\n"
-		row_of_content.each do |card|
-			card_content += "<td>\n"
-			card_content += "<h1>" + card[:title] + "</h1>"
-			card_content += "<h2>" + card[:subtitle] + "</h2>"
-			card_html = card_html_modifier(card[:description])
-			card_content += "<p>" + card_html + "</p>"
-			card_content += "</td>\n"
+	card_content = ""
+	row_count = 0
+	content.each_slice(page_size) do |page_of_content|
+		card_content += "<table>\n"
+		page_of_content.each_slice(row_size) do |row_of_content|
+			card_content += "<tr>\n"
+			row_of_content.each do |card|
+				card_content += "<td>\n"
+				card_content += "<h1>" + card[:title] + "</h1>"
+				card_content += "<h2>" + card[:subtitle] + "</h2>"
+				card_html = card_html_modifier(card[:description])
+				card_content += "<p>" + card_html + "</p>"
+				card_content += "</td>\n"
+			end
+			card_content += "</tr>\n"
+			if row_count.even?
+				card_content += "<tr class='separator' />\n"
+			end
+			row_count += 1
 		end
-		card_content += "</tr>\n"
-		if row_count.even?
-			card_content += "<tr class='separator' />\n"
-		end
-		row_count += 1
+		card_content += "<table>\n"
 	end
-	card_content += "<table>\n"
+	card_content
+end
+
+def content_strategy_addresses(content)
+	page_size = 30
+	row_size = 3
+
+	card_content = ""
+	content.each_slice(page_size) do |page_of_content|
+		card_content += "<table>\n"
+		page_of_content.each_slice(row_size) do |row_of_content|
+			card_content += "<tr>\n"
+			col_count = 0
+			row_of_content.each do |card|
+				card_content += "<td>\n"
+				card_content += "<h1>" + card[:title] + "</h1>"
+				card_content += "<h2>" + card[:subtitle] + "</h2>"
+				card_html = card_html_modifier(card[:description])
+				card_content += "<p>" + card_html + "</p>"
+				card_content += "</td>\n"
+				if col_count < row_size
+					card_content += "<td class='separator' />\n"
+				end
+				col_count += 1
+			end
+			card_content += "</tr>\n"
+		end
+		card_content += "<table>\n"
+	end
+	card_content
+end
+
+if template_input =~ /5160/
+	card_content = content_strategy_addresses(content)
+else
+	card_content = content_strategy_wide(content)
 end
 
 File.open("#{output_codename}.html", "w"){|f| f << tmpl.sub("$CONTENT", card_content)}
